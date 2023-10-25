@@ -1,4 +1,8 @@
 // ExcelUploader.tsx
+
+// delete@git-repo  /c/remove/repository (main-branch)
+// $ rm -fr .git
+
 import React, { useState } from 'react';
 import axios from 'axios';
 
