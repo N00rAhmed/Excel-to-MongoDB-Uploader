@@ -1,79 +1,63 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+import "../src/App.css";
 
 const ExcelUploader: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [mongoURI, setMongoURI] = useState('');
-  const [collectionName, setCollectionName] = useState('');
+  const [mongoUri, setMongoUri] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFile(e.target.files[0]);
-    }
+  const handleUriChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setMongoUri(event.target.value);
   };
 
-  const handleMongoURIChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMongoURI(e.target.value);
+  const handleMessageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setMessage(event.target.value);
   };
 
-  const handleCollectionNameChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCollectionName(e.target.value);
-  };
-  
-  // mongodb+srv://tronn232003:ow3bcTm8yahnrrBF@cluster0.mceoov1.mongodb.net/?retryWrites=true&w=majority
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  const handleSubmit = async () => {
-    if (!file || !mongoURI || !collectionName) return;
-
-    const formData = new FormData();
-    formData.append('excelFile', file);
-    formData.append('mongoURI', mongoURI);
-    formData.append('collectionName', collectionName);
-    
     try {
-      const response = await axios.post("http://localhost:4000/api/upload", formData, {
+      const response = await fetch('http://localhost:4000/send-message', {
+        method: 'POST',
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ mongoUri, message }),
       });
-    
-      if (response.status === 200) {
-        alert('Data saved to MongoDB');
-      }
+
+      const data = await response.json();
+      console.log(data);
     } catch (error) {
-      console.error('Error uploading data:', error);
-      alert('Error uploading data to MongoDB');
+      console.error('Error:', error);
     }
-  }
+  };
+
   return (
     <div>
-      <h1>Excel to MongoDB Uploader</h1>
-      <input type="file" accept=".xlsx" onChange={handleFileChange} />
-      
-      <br />
-      <br/>
-
-      <textarea
-        // type="text"
-        style={{ width: '500px' }}
-        placeholder="MongoDB URI"
-        value={mongoURI}
-        onChange={handleMongoURIChange}
-      />
-
-      <br />
-
-      <textarea
-        // type="text"
-        // style={{ width: '500px' }}
-        placeholder="Collection Name"
-        value={collectionName}
-        onChange={handleCollectionNameChange}
-      />
-
-      <br />
-
-      <button onClick={handleSubmit}>Upload and Save to MongoDB</button>
+      <form className='container' onSubmit={handleSubmit}>
+        <label>
+          Enter MongoDB URI:
+          
+          <input
+            type="text"
+            style={{ height: '50px', width: '500px' }}
+            value={mongoUri}
+            onChange={handleUriChange}
+            placeholder="mongodb://username:password@host:port/database"
+          />
+        </label>
+        <label>
+          Enter Message:
+          <input
+            type="text"
+            style={{ height: '50px', width: '500px' }}
+            value={message}
+            onChange={handleMessageChange}
+            placeholder="Your message"
+          />
+        </label>
+        <button type="submit">Submit</button>
+      </form>
     </div>
   );
 };

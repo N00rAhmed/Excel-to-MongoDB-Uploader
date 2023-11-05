@@ -1,0 +1,21 @@
+.container{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5%;
+}
+
+input{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+label{
+    margin-top: 50px;
+}
+
+button{
+    margin-top: 40px;
+}

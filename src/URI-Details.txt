@@ -1,0 +1,6 @@
+TEST CLUSTER:
+tronn232003
+ow3bcTm8yahnrrBF
+
+TEST CLUSTER URI
+mongodb+srv://tronn232003:ow3bcTm8yahnrrBF@cluster0.mceoov1.mongodb.net/?retryWrites=true&w=majority
