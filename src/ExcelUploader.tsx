@@ -56,6 +56,21 @@ const ExcelUploader: React.FC = () => {
             placeholder="Your message"
           />
         </label>
+
+
+        {/* <label>
+          Enter Message:
+          <input
+            type="file"
+            style={{ height: '50px', width: '500px' }}
+            value={message}
+            onChange={handleMessageChange}
+            placeholder="Your message"
+          />
+        </label>
+ */}
+
+
         <button type="submit">Submit</button>
       </form>
     </div>
