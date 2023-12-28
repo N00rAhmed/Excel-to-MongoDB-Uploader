@@ -1,9 +1,45 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import "../src/App.css";
+import * as XLSX from 'xlsx';
 
 const ExcelUploader: React.FC = () => {
   const [mongoUri, setMongoUri] = useState<string>('');
   const [message, setMessage] = useState<string>('');
+  const [file, setFile] = useState<File | null>(null);
+  const [jsonData, setJsonData] = useState('');
+
+  const handleConvert = () => {
+    //     e.preventDefault();
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target!.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet);
+        setJsonData(JSON.stringify(json, null, 2)); // Update jsonData state
+      };
+      reader.readAsBinaryString(file);
+      }
+  };
+  
+  useEffect(() => {
+    console.log(jsonData); // This will log the updated state whenever jsonData changes
+  }, [jsonData]);
+    
+
+  
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+      console.log(jsonData);
+
+    }
+  };
+
 
   const handleUriChange = (event: ChangeEvent<HTMLInputElement>) => {
     setMongoUri(event.target.value);
@@ -34,7 +70,8 @@ const ExcelUploader: React.FC = () => {
 
   return (
     <div>
-      <form className='container' onSubmit={handleSubmit}>
+      {/* onSubmit={handleSubmit} */}
+      <form className='container' >
         <label>
           Enter MongoDB URI:
           
@@ -47,14 +84,20 @@ const ExcelUploader: React.FC = () => {
           />
         </label>
         <label>
-          Enter Message:
-          <input
+          Enter File:
+          {/* <input
             type="text"
             style={{ height: '50px', width: '500px' }}
             value={message}
             onChange={handleMessageChange}
             placeholder="Your message"
-          />
+          /> */}
+      <input
+        type="file"
+        accept=".xls,.xlsx"
+        onChange={handleFileChange}
+      />
+
         </label>
 
 
@@ -71,7 +114,10 @@ const ExcelUploader: React.FC = () => {
  */}
 
 
-        <button type="submit">Submit</button>
+        {/* <button type="submit">Submit</button> */}
+        <button onClick={handleConvert}>Convert</button>
+        <pre>{jsonData}</pre>
+
       </form>
     </div>
   );
