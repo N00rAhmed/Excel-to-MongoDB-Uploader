@@ -8,37 +8,41 @@ const ExcelUploader: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [jsonData, setJsonData] = useState('');
 
-  const handleConvert = () => {
-    //     e.preventDefault();
+  const [excelData, setExcelData] = useState(null);
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const data = e.target!.result;
-        const workbook = XLSX.read(data, { type: "binary" });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(worksheet);
-        setJsonData(JSON.stringify(json, null, 2)); // Update jsonData state
-      };
-      reader.readAsBinaryString(file);
-      }
-  };
-  
-  useEffect(() => {
-    console.log(jsonData); // This will log the updated state whenever jsonData changes
-  }, [jsonData]);
-    
 
-  
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      console.log(jsonData);
+  const readUploadFile = (e: any) => {
+    e.preventDefault();
+    if (e.target.files) {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+            const data = e.target.result;
+            setExcelData(data); // store the file data in state
 
+            // const workbook = XLSX.read(data, { type: "array" });
+            // const sheetName = workbook.SheetNames[0];
+            // const worksheet = workbook.Sheets[sheetName];
+            // const json = XLSX.utils.sheet_to_json(worksheet);
+            // console.log(json);
+        };
+        reader.readAsArrayBuffer(e.target.files[0]);
+    }
+}
+
+  const handleConvertExcelFile = () => {
+    if (excelData) {
+      const workbook = XLSX.read(excelData, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet);
+      console.log(json);
+    }
+    else{
+      console.error('No file data available');
     }
   };
+
+  
 
 
   const handleUriChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +62,7 @@ const ExcelUploader: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ mongoUri, message }),
+        body: JSON.stringify({ mongoUri, excelData }),
       });
 
       const data = await response.json();
@@ -71,7 +75,7 @@ const ExcelUploader: React.FC = () => {
   return (
     <div>
       {/* onSubmit={handleSubmit} */}
-      <form className='container' >
+      <form className='container' onSubmit={handleSubmit} >
         <label>
           Enter MongoDB URI:
           
@@ -83,40 +87,18 @@ const ExcelUploader: React.FC = () => {
             placeholder="mongodb://username:password@host:port/database"
           />
         </label>
-        <label>
-          Enter File:
-          {/* <input
-            type="text"
-            style={{ height: '50px', width: '500px' }}
-            value={message}
-            onChange={handleMessageChange}
-            placeholder="Your message"
-          /> */}
-      <input
+
+<label htmlFor="upload">Upload File</label>
+    <input
         type="file"
-        accept=".xls,.xlsx"
-        onChange={handleFileChange}
-      />
-
-        </label>
-
-
-        {/* <label>
-          Enter Message:
-          <input
-            type="file"
-            style={{ height: '50px', width: '500px' }}
-            value={message}
-            onChange={handleMessageChange}
-            placeholder="Your message"
-          />
-        </label>
- */}
+        name="upload"
+        id="upload"
+        onChange={readUploadFile}
+    />
 
 
         {/* <button type="submit">Submit</button> */}
-        <button onClick={handleConvert}>Convert</button>
-        <pre>{jsonData}</pre>
+        <button onClick={handleConvertExcelFile}>Convert/Send</button>
 
       </form>
     </div>
