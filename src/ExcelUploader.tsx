@@ -4,9 +4,6 @@ import * as XLSX from 'xlsx';
 
 const ExcelUploader: React.FC = () => {
   const [mongoUri, setMongoUri] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
-  const [file, setFile] = useState<File | null>(null);
-  const [jsonData, setJsonData] = useState('');
 
   const [excelData, setExcelData] = useState(null);
 
@@ -42,16 +39,12 @@ const ExcelUploader: React.FC = () => {
     }
   };
 
-  
 
 
   const handleUriChange = (event: ChangeEvent<HTMLInputElement>) => {
     setMongoUri(event.target.value);
   };
 
-  const handleMessageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setMessage(event.target.value);
-  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,6 +58,10 @@ const ExcelUploader: React.FC = () => {
         body: JSON.stringify({ mongoUri, excelData }),
       });
 
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
       const data = await response.json();
       console.log(data);
     } catch (error) {
@@ -74,7 +71,7 @@ const ExcelUploader: React.FC = () => {
 
   return (
     <div>
-      {/* onSubmit={handleSubmit} */}
+
       <form className='container' onSubmit={handleSubmit} >
         <label>
           Enter MongoDB URI:
@@ -97,7 +94,6 @@ const ExcelUploader: React.FC = () => {
     />
 
 
-        {/* <button type="submit">Submit</button> */}
         <button onClick={handleConvertExcelFile}>Convert/Send</button>
 
       </form>
